@@ -1,3 +1,8 @@
+# This block is not in the book.
+# It is used to choose a number to set for page views.
+from random import seed, randint
+seed(1999)
+
 import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tango_with_django_project.settings")
@@ -52,7 +57,7 @@ def populate():
     for cat, cat_data in cats.items():
         c = add_cat(cat, views=cat_data['views'], likes=cat_data['likes'])
         for p in cat_data['pages']:
-            add_page(c, p['title'], p['url'])
+            add_page(c, p['title'], p['url'], views=randint(1,50))
 
     for c in Category.objects.all():
         for p in Page.objects.filter(category=c):
