@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from rango.models import Category, Page
 from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
+from rango.bing_search import run_query
 from datetime import datetime
 
 def get_server_side_cookie(request, cookie, default_val=0):
@@ -113,6 +114,20 @@ def add_page(request, category_name_slug):
     context_dict = {'form': form, 'category': category}
     return render(request, 'rango/add_page.html', context=context_dict)
 
+@login_required
+def restricted(request):
+    return render(request, 'rango/restricted.html')
+
+def search(request):
+    result_list = []
+
+    if request.method == 'POST':
+        query = request.POST['query'].strip()
+        if query:
+            result_list = run_query(query)
+    
+    return render(request, 'rango/search.html', context={'result_list':result_list,'query_text':query})
+
 
 # COMMENTED BLOCKS OF CODE IS THE MANUAL WAY FOR PROVIDING THE FUNCTIONALITIES.
 # INSTEAD, NOW THE REGISTRATION APP PROVIDED BY DJANGO IS USED.
@@ -165,9 +180,6 @@ def add_page(request, category_name_slug):
 #     else:
 #         return render(request, 'rango/login.html')
 
-@login_required
-def restricted(request):
-    return render(request, 'rango/restricted.html')
 
 # @login_required
 # def user_logout(request):
