@@ -119,6 +119,7 @@ def restricted(request):
     return render(request, 'rango/restricted.html')
 
 def search(request):
+    query = ''
     result_list = []
 
     if request.method == 'POST':
