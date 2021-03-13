@@ -130,3 +130,7 @@ dmypy.json
 
 # I added this for bing search key
 *.key
+
+# ignore .idea and .vscode config files
+.idea
+.vscode
