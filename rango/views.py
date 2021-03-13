@@ -9,6 +9,9 @@ from rango.models import Category, Page
 from rango.forms import CategoryForm, PageForm, UserForm, UserProfileForm
 from rango.bing_search import run_query
 from datetime import datetime
+from django.views.generic.base import View
+from django.utils.decorators import method_decorator
+from rango.helpers import get_category_list
 
 def get_server_side_cookie(request, cookie, default_val=0):
     val = request.session.get(cookie)
@@ -128,6 +131,36 @@ def search(request):
             result_list = run_query(query)
     
     return render(request, 'rango/search.html', context={'result_list':result_list,'query_text':query})
+
+class LikeCategoryView(View):
+    @method_decorator(login_required)
+    def get(self, request):
+        category_id = request.GET['category_id']
+
+        try:
+            category = Category.objects.get(id=int(category_id))
+        except Category.DoesNotExist:
+            return HttpResponse(-1)
+        except ValueError:
+            return HttpResponse(-1)
+
+        category.likes += 1
+        category.save()
+
+        return HttpResponse(category.likes)
+
+class CategorySuggestionView(View):
+    def get(self, request):
+        suggestion = request.GET.get('suggestion','')
+
+        category_list = get_category_list(8, suggestion)
+
+        if not category_list:
+            category_list = Category.objects.order_by('-likes')
+
+        return render(request, 'rango/categories.html', {'categories':category_list})
+
+
 
 
 # COMMENTED BLOCKS OF CODE IS THE MANUAL WAY FOR PROVIDING THE FUNCTIONALITIES.
